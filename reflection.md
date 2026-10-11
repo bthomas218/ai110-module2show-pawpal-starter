@@ -30,22 +30,23 @@
 
 **b. Design changes**
 
-The design changed in three main ways. First, `User` remains the owner of its
-`Pet` objects, and each `Pet` remains the owner of its `Task` objects. The
-`Scheduler` no longer keeps a second map of user IDs, pet IDs, and tasks. It
-now reads the user's pets and builds a schedule from their existing tasks.
-This avoids two sources of truth that could become inconsistent.
+The design changed in several ways during implementation. The original
+`User` class is now named `Owner` to match the domain language. `Owner` owns
+the collection of `Pet` objects and provides `get_all_tasks()`, which flattens
+the tasks from every pet into one collection.
 
-Second, `Task`, `Pet`, and `User` use Python dataclasses with direct public
-fields instead of boilerplate getters and setters. The fields are easier to
-read and update, while meaningful behavior such as `mark_complete`,
-`add_task`, and `add_pet` remains as methods.
+The `Scheduler` no longer stores a duplicate map of users, pets, and tasks.
+Instead, it must retrieve tasks through `Owner.get_all_tasks()`, then filter
+out completed tasks and order the remaining tasks by their scheduled time.
+This keeps ownership in the domain objects and gives the scheduler one clear
+entry point for working across multiple pets.
 
-Finally, `Task` now includes `duration_minutes` and `priority`. These fields
-were added because the project requires scheduling based on available time
-and task importance. The scheduler also accepts a target date and optional
-available time so the later implementation can support the project's
-"today's schedule" use case.
+`Task` was also changed to represent the requested activity data directly:
+description, time, frequency, and completion status. Dataclasses expose these
+fields without boilerplate getters and setters, while behavior that changes
+state—such as `mark_complete`, adding pets, and adding tasks—remains on the
+appropriate class. The scheduler additionally provides `complete_task()` and
+`render_schedule()` so it can manage and present the combined task list.
 
 ---
 

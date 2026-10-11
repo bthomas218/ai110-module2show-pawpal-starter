@@ -2,11 +2,11 @@ classDiagram
     class Task {
         +TaskId id
         +str description
-        +date due_date
-        +int duration_minutes
-        +str priority
+        +time time
+        +str frequency
         +bool completion_status
         +mark_complete()
+        +is_complete() bool
     }
 
     class Pet {
@@ -19,23 +19,23 @@ classDiagram
         +remove_task(Task)
     }
 
-    class User {
-        +UserId id
+    class Owner {
+        +OwnerId id
         +str name
         +str email
         +list~Pet~ pets
         +add_pet(Pet)
         +remove_pet(Pet)
+        +get_all_tasks() list~Task~
     }
 
     class Scheduler {
-        +build_schedule(User, date, int) dict
-        +render_schedule(User, date) str
+        +build_schedule(Owner) list~Task~
+        +complete_task(Owner, TaskId) bool
+        +render_schedule(Owner) str
     }
 
-    %% build_schedule returns tasks grouped by PetId.
-    User "1" *-- "0..*" Pet : owns
+    Owner "1" *-- "0..*" Pet : owns
     Pet "1" *-- "0..*" Task : owns
-    Scheduler ..> User : reads
-    Scheduler ..> Pet : reads tasks from
+    Scheduler ..> Owner : reads all tasks from
     Scheduler ..> Task : organizes
