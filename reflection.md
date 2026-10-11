@@ -7,6 +7,27 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+### Three Core Actions
+
+1. Add a pet
+2. Schedule tasks for pets
+3. View today's schedule
+
+### Classes and Responsibilities
+
+- **Pet**: Represents a pet in the system. Responsibilities include storing pet information and managing its tasks.
+  - Attributes: id, name, species, age, tasks (list of Task objects)
+  - Methods: setName(String), setSpecies(String), setAge(int), addTask(Task), removeTask(Task), getTasks(), getId()
+- **Task**: Represents a task to be performed for a pet. Responsibilities include storing task details and tracking its completion status.
+  - Attributes: id, description, dueDate, completionStatus
+  - Methods: setDescription(String), setDueDate(Date), setCompletionStatus(boolean), getDescription(), getDueDate(), getCompletionStatus(), markComplete() getId()
+- **Scheduler**: Manages the scheduling of tasks for pets. Responsibilities include retrieving, organizing, and managing tasks across multiple pets.
+  - Attributes: schedule (map of tuple (UserId, PetId) to list of Task objects)
+  - Methods: addTaskForPet(UserId, TaskId, PetId), getTasksForPet(UserId, PetId), removeTaskForPet(UserId, PetId), renderSchedule(UserId)
+- **User**: Represents the user interacting with the system. Responsibilities include storing user information and managing their pets.
+  - Attributes: id, name, email, pets (list of Pet objects)
+  - Methods: addPet(Pet), removePet(Pet), getPets(), getName(), getEmail(), setName(String), setEmail(String), getId()
+
 **b. Design changes**
 
 - Did your design change during implementation?

@@ -1,0 +1,60 @@
+classDiagram
+    class User {
+        -String id
+        -String name
+        -String email
+        -List~Pet~ pets
+        +addPet(Pet pet)
+        +removePet(Pet pet)
+        +getPets() List~Pet~
+        +getName() String
+        +getEmail() String
+        +setName(String name)
+        +setEmail(String email)
+        +getId() String
+    }
+
+    class Pet {
+        -String id
+        -String name
+        -String species
+        -int age
+        -List~Task~ tasks
+        +setName(String name)
+        +setSpecies(String species)
+        +setAge(int age)
+        +addTask(Task task)
+        +removeTask(Task task)
+        +getTasks() List~Task~
+        +getId() String
+    }
+
+    class Task {
+        -String id
+        -String description
+        -Date dueDate
+        -boolean completionStatus
+        +setDescription(String description)
+        +setDueDate(Date dueDate)
+        +setCompletionStatus(boolean status)
+        +getDescription() String
+        +getDueDate() Date
+        +getCompletionStatus() boolean
+        +markComplete()
+        +getId() String
+    }
+
+    class Scheduler {
+        -Map schedule
+        +addTaskForPet(UserId userId, TaskId taskId, PetId petId)
+        +getTasksForPet(UserId userId, PetId petId) List~Task~
+        +removeTaskForPet(UserId userId, PetId petId)
+        +renderSchedule(UserId userId)
+    }
+
+    %% schedule maps (UserId, PetId) tuples to lists of Task objects.
+
+    User "1" *-- "0..*" Pet : manages
+    Pet "1" *-- "0..*" Task : has
+    User "1" --> "1" Scheduler : uses
+    Scheduler "1" o-- "0..*" Task : schedules
