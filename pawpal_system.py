@@ -1,7 +1,7 @@
-"""Core domain model skeleton for PawPal+.
+"""Core domain model for PawPal+.
 
-The classes in this module mirror the initial UML design. Scheduling behavior
-can be implemented incrementally without changing the basic data model.
+The data classes own the application's state. Scheduler is a stateless service
+that reads a user's pets and builds a plan from their tasks.
 """
 
 from __future__ import annotations
@@ -13,7 +13,6 @@ from datetime import date
 UserId = str
 PetId = str
 TaskId = str
-ScheduleKey = tuple[UserId, PetId]
 
 
 @dataclass
@@ -23,31 +22,13 @@ class Task:
     id: TaskId
     description: str
     due_date: date | None = None
+    duration_minutes: int = 0
+    priority: str = "medium"
     completion_status: bool = False
 
-    def set_description(self, description: str) -> None:
-        raise NotImplementedError
-
-    def set_due_date(self, due_date: date) -> None:
-        raise NotImplementedError
-
-    def set_completion_status(self, status: bool) -> None:
-        raise NotImplementedError
-
-    def get_description(self) -> str:
-        raise NotImplementedError
-
-    def get_due_date(self) -> date | None:
-        raise NotImplementedError
-
-    def get_completion_status(self) -> bool:
-        raise NotImplementedError
-
     def mark_complete(self) -> None:
-        raise NotImplementedError
-
-    def get_id(self) -> TaskId:
-        raise NotImplementedError
+        """Mark this task as completed."""
+        self.completion_status = True
 
 
 @dataclass
@@ -60,26 +41,13 @@ class Pet:
     age: int
     tasks: list[Task] = field(default_factory=list)
 
-    def set_name(self, name: str) -> None:
-        raise NotImplementedError
-
-    def set_species(self, species: str) -> None:
-        raise NotImplementedError
-
-    def set_age(self, age: int) -> None:
-        raise NotImplementedError
-
     def add_task(self, task: Task) -> None:
-        raise NotImplementedError
+        """Add a task to this pet's task list."""
+        self.tasks.append(task)
 
     def remove_task(self, task: Task) -> None:
-        raise NotImplementedError
-
-    def get_tasks(self) -> list[Task]:
-        raise NotImplementedError
-
-    def get_id(self) -> PetId:
-        raise NotImplementedError
+        """Remove a task from this pet's task list."""
+        self.tasks.remove(task)
 
 
 @dataclass
@@ -92,48 +60,30 @@ class User:
     pets: list[Pet] = field(default_factory=list)
 
     def add_pet(self, pet: Pet) -> None:
-        raise NotImplementedError
+        """Add a pet to this user's pets."""
+        self.pets.append(pet)
 
     def remove_pet(self, pet: Pet) -> None:
-        raise NotImplementedError
-
-    def get_pets(self) -> list[Pet]:
-        raise NotImplementedError
-
-    def get_name(self) -> str:
-        raise NotImplementedError
-
-    def get_email(self) -> str:
-        raise NotImplementedError
-
-    def set_name(self, name: str) -> None:
-        raise NotImplementedError
-
-    def set_email(self, email: str) -> None:
-        raise NotImplementedError
-
-    def get_id(self) -> UserId:
-        raise NotImplementedError
+        """Remove a pet from this user's pets."""
+        self.pets.remove(pet)
 
 
-@dataclass
 class Scheduler:
-    """Stores tasks grouped by user and pet until scheduling is implemented."""
+    """Builds schedules from the tasks already owned by a user's pets."""
 
-    schedule: dict[ScheduleKey, list[Task]] = field(default_factory=dict)
+    def build_schedule(
+        self,
+        user: User,
+        schedule_date: date,
+        available_minutes: int | None = None,
+    ) -> dict[PetId, list[Task]]:
+        """Return the user's tasks grouped by pet for a given date.
 
-    def add_task_for_pet(
-        self, user_id: UserId, task_id: TaskId, pet_id: PetId
-    ) -> None:
+        Scheduling and prioritization logic will be implemented after the
+        domain model is finalized.
+        """
         raise NotImplementedError
 
-    def get_tasks_for_pet(
-        self, user_id: UserId, pet_id: PetId
-    ) -> list[Task]:
-        raise NotImplementedError
-
-    def remove_task_for_pet(self, user_id: UserId, pet_id: PetId) -> None:
-        raise NotImplementedError
-
-    def render_schedule(self, user_id: UserId) -> str:
+    def render_schedule(self, user: User, schedule_date: date) -> str:
+        """Render a user's schedule for display."""
         raise NotImplementedError
