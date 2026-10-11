@@ -43,14 +43,20 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 
 ## 🖥️ Sample Output
 
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+Run the command-line demonstration with:
+
+```bash
+uv run python main.py
+```
+
+Example terminal output:
 
 ```
-# e.g.:
-# Daily plan for Biscuit (Golden Retriever):
-#   08:00 — Morning walk (30 min) [priority: high]
-#   09:00 — Feeding (10 min) [priority: high]
-#   ...
+Today's Schedule
+Schedule for Jordan
+08:00 - Morning walk (daily)
+08:30 - Breakfast (daily)
+18:00 - Evening play (daily)
 ```
 
 ## 🧪 Testing PawPal+
