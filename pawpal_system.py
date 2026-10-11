@@ -75,20 +75,12 @@ class Scheduler:
     """The scheduling service for tasks across all of an owner's pets."""
 
     def build_schedule(self, owner: Owner) -> list[Task]:
-        """Return incomplete tasks from all pets, ordered by scheduled time.
-
-        The scheduler deliberately retrieves tasks through ``owner`` instead
-        of reading a particular pet directly. Tasks without a time are placed
-        after timed tasks while preserving their original order.
-        """
+        """Return incomplete tasks from all pets, ordered by scheduled time."""
         tasks = [task for task in owner.get_all_tasks() if not task.is_complete()]
         return sorted(tasks, key=lambda task: (task.time is None, task.time or Time.max))
 
     def complete_task(self, owner: Owner, task_id: TaskId) -> bool:
-        """Complete a task found across the owner's pets.
-
-        Return ``True`` when a matching task is found, otherwise ``False``.
-        """
+        """Complete a task found across the owner's pets. Return ``True`` when a matching task is found, otherwise ``False``."""
         for task in owner.get_all_tasks():
             if task.id == task_id:
                 task.mark_complete()

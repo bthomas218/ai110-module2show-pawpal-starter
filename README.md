@@ -22,6 +22,16 @@ Your final app should:
 - Display the plan clearly (and ideally explain the reasoning)
 - Include tests for the most important scheduling behaviors
 
+## Implementation Summary
+
+The core implementation uses dataclasses for `Task`, `Pet`, and `Owner`.
+Each pet owns its task list, and an owner manages multiple pets and exposes
+`get_all_tasks()` to return tasks across the entire household. `Scheduler` is
+a separate service that reads tasks through the owner, removes completed
+tasks, orders the remaining tasks by time, and can render or complete tasks.
+The command-line demo in `main.py` connects these classes, while pytest tests
+cover task completion and adding tasks to pets.
+
 ## Getting started
 
 ### Setup

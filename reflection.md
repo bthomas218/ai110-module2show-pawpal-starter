@@ -68,13 +68,28 @@ appropriate class. The scheduler additionally provides `complete_task()` and
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used AI to review the initial UML design, create the first Mermaid diagram,
+draft the Python dataclasses, and identify gaps in the scheduling model. The
+most useful prompts asked the AI to compare the design with the project
+requirements and to point out duplicate ownership, unclear method signatures,
+and missing scheduling information.
+
+The AI also helped create the command-line demonstration and draft the two
+pytest tests for task completion and task addition.
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+I did not accept the idea of giving `Scheduler` its own map of users, pets,
+and tasks as the final design. After reviewing it, I chose to keep ownership
+in `Owner` and `Pet`, then added `Owner.get_all_tasks()` so the scheduler could
+work across pets without duplicating state. I also rejected unnecessary
+getter and setter methods because Python dataclasses provide direct field
+access.
+
+I verified the revised design by checking that the scheduler calls
+`Owner.get_all_tasks()`, running the command-line demo, compiling the Python
+modules, and running the pytest suite. The final tests passed for task
+completion and task addition.
 
 ---
 
