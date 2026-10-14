@@ -13,12 +13,25 @@ def main() -> None:
     owner.add_pet(mochi)
     owner.add_pet(luna)
 
-    mochi.add_task(Task("task-1", "Morning walk", time(8, 0), "daily"))
+    # Add tasks out of chronological order to demonstrate sorting.
+    mochi.add_task(Task("task-1", "Evening play", time(18, 0), "daily"))
     luna.add_task(Task("task-2", "Breakfast", time(8, 30), "daily"))
-    mochi.add_task(Task("task-3", "Evening play", time(18, 0), "daily"))
+    mochi.add_task(Task("task-3", "Morning walk", time(8, 0), "daily"))
+
+    scheduler = Scheduler()
 
     print("Today's Schedule")
-    print(Scheduler().render_schedule(owner))
+    print(scheduler.render_schedule(owner))
+
+    print("\nMochi's Tasks (filtered by pet)")
+    for task in scheduler.sort_tasks(scheduler.filter_tasks(owner, pet_name="Mochi")):
+        print(f"{task.time.strftime('%H:%M')} - {task.description}")
+
+    mochi.tasks[0].mark_complete()
+    print("\nIncomplete Tasks (filtered by completion status)")
+    incomplete_tasks = scheduler.filter_tasks(owner, completion_status=False)
+    for task in scheduler.sort_tasks(incomplete_tasks):
+        print(f"{task.time.strftime('%H:%M')} - {task.description}")
 
 
 if __name__ == "__main__":

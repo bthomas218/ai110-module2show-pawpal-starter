@@ -74,10 +74,36 @@ class Owner:
 class Scheduler:
     """The scheduling service for tasks across all of an owner's pets."""
 
+    def sort_tasks(self, tasks: list[Task]) -> list[Task]:
+        """Return tasks ordered by scheduled time."""
+        return sorted(
+            tasks,
+            key=lambda task: (task.time is None, task.time or Time.max),
+        )
+
+    def filter_tasks(
+        self,
+        owner: Owner,
+        completion_status: bool | None = None,
+        pet_name: str | None = None,
+    ) -> list[Task]:
+        """Return an owner's tasks matching completion status and/or pet name."""
+        matching_tasks: list[Task] = []
+        for pet in owner.pets:
+            if pet_name is not None and pet.name.lower() != pet_name.lower():
+                continue
+            for task in pet.tasks:
+                if (
+                    completion_status is None
+                    or task.is_complete() == completion_status
+                ):
+                    matching_tasks.append(task)
+        return matching_tasks
+
     def build_schedule(self, owner: Owner) -> list[Task]:
         """Return incomplete tasks from all pets, ordered by scheduled time."""
-        tasks = [task for task in owner.get_all_tasks() if not task.is_complete()]
-        return sorted(tasks, key=lambda task: (task.time is None, task.time or Time.max))
+        tasks = self.filter_tasks(owner, completion_status=False)
+        return self.sort_tasks(tasks)
 
     def complete_task(self, owner: Owner, task_id: TaskId) -> bool:
         """Complete a task found across the owner's pets. Return ``True`` when a matching task is found, otherwise ``False``."""
