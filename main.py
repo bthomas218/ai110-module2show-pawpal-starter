@@ -14,9 +14,15 @@ def main() -> None:
     owner.add_pet(luna)
 
     # Add tasks out of chronological order to demonstrate sorting.
-    mochi.add_task(Task("task-1", "Evening play", time(18, 0), "daily"))
-    luna.add_task(Task("task-2", "Breakfast", time(8, 0), "daily"))
-    mochi.add_task(Task("task-3", "Morning walk", time(8, 0), "daily"))
+    mochi.add_task(
+        Task("task-1", "Evening play", time(18, 0), "daily", duration_minutes=30)
+    )
+    luna.add_task(
+        Task("task-2", "Breakfast", time(8, 15), "daily", duration_minutes=15)
+    )
+    mochi.add_task(
+        Task("task-3", "Morning walk", time(8, 0), "daily", duration_minutes=30)
+    )
 
     scheduler = Scheduler()
 

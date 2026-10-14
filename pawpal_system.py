@@ -21,6 +21,7 @@ class Task:
     frequency: str = "once"
     completion_status: bool = False
     due_date: date | None = None
+    duration_minutes: int = 0
 
     def mark_complete(self) -> None:
         """Mark this task as completed."""
@@ -102,25 +103,55 @@ class Scheduler:
         return matching_tasks
 
     def detect_conflicts(self, owner: Owner) -> list[str]:
-        """Return warnings for incomplete tasks sharing the same scheduled time."""
-        tasks_by_time: dict[Time, list[tuple[str, Task]]] = {}
+        """Return warnings for incomplete tasks with overlapping time ranges."""
+        scheduled_tasks: list[tuple[str, Task]] = []
         for pet in owner.pets:
             for task in pet.tasks:
                 if not task.is_complete() and task.time is not None:
-                    tasks_by_time.setdefault(task.time, []).append((pet.name, task))
+                    scheduled_tasks.append((pet.name, task))
 
         warnings: list[str] = []
-        for scheduled_time, pet_tasks in tasks_by_time.items():
-            if len(pet_tasks) < 2:
-                continue
-            task_details = "; ".join(
-                f"{pet_name}: {task.description}" for pet_name, task in pet_tasks
-            )
-            warnings.append(
-                f"Warning: {len(pet_tasks)} tasks are scheduled at "
-                f"{scheduled_time.strftime('%H:%M')} ({task_details})."
-            )
+        for index, (pet_name, task) in enumerate(scheduled_tasks):
+            for other_pet_name, other_task in scheduled_tasks[index + 1 :]:
+                if task.due_date != other_task.due_date:
+                    continue
+                if not self._tasks_overlap(task, other_task):
+                    continue
+                warnings.append(
+                    "Warning: overlapping tasks - "
+                    f"{pet_name}: {task.description} "
+                    f"({self._task_time_range(task)}) and "
+                    f"{other_pet_name}: {other_task.description} "
+                    f"({self._task_time_range(other_task)})."
+                )
         return warnings
+
+    def _tasks_overlap(self, first: Task, second: Task) -> bool:
+        """Return whether two scheduled tasks overlap in time."""
+        first_start = self._minutes_since_midnight(first)
+        second_start = self._minutes_since_midnight(second)
+        first_end = first_start + max(first.duration_minutes, 0)
+        second_end = second_start + max(second.duration_minutes, 0)
+
+        if first.duration_minutes <= 0 or second.duration_minutes <= 0:
+            return first_start == second_start
+        return first_start < second_end and second_start < first_end
+
+    def _minutes_since_midnight(self, task: Task) -> int:
+        if task.time is None:
+            return 0
+        return task.time.hour * 60 + task.time.minute
+
+    def _task_time_range(self, task: Task) -> str:
+        start = self._minutes_since_midnight(task)
+        end = start + max(task.duration_minutes, 0)
+        end_hour, end_minute = divmod(end, 60)
+        end_hour %= 24
+        return (
+            f"{task.time:%H:%M}-{end_hour:02d}:{end_minute:02d}"
+            if task.time is not None
+            else "Any time"
+        )
 
     def build_schedule(self, owner: Owner) -> list[Task]:
         """Return incomplete tasks from all pets, ordered by scheduled time."""

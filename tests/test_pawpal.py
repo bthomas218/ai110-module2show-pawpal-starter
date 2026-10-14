@@ -68,8 +68,8 @@ def test_detect_conflicts_returns_warning_for_tasks_at_same_time() -> None:
     owner = Owner("owner-1", "Jordan", "jordan@example.com")
     mochi = Pet("pet-1", "Mochi", "dog", 3)
     luna = Pet("pet-2", "Luna", "cat", 5)
-    mochi.add_task(Task("task-1", "Morning walk", time(8, 0)))
-    luna.add_task(Task("task-2", "Breakfast", time(8, 0)))
+    mochi.add_task(Task("task-1", "Morning walk", time(8, 0), duration_minutes=30))
+    luna.add_task(Task("task-2", "Breakfast", time(8, 15), duration_minutes=15))
     owner.add_pet(mochi)
     owner.add_pet(luna)
 
@@ -77,6 +77,7 @@ def test_detect_conflicts_returns_warning_for_tasks_at_same_time() -> None:
 
     assert len(warnings) == 1
     assert "Warning:" in warnings[0]
-    assert "08:00" in warnings[0]
+    assert "08:00-08:30" in warnings[0]
+    assert "08:15-08:30" in warnings[0]
     assert "Mochi" in warnings[0]
     assert "Luna" in warnings[0]

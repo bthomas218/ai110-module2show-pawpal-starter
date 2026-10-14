@@ -54,13 +54,35 @@ appropriate class. The scheduler additionally provides `complete_task()` and
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler considers whether a task is complete, the task's scheduled time,
+the pet it belongs to, its duration, and its recurrence frequency. The daily
+schedule removes completed tasks and sorts the remaining tasks by time. Tasks
+without a time are placed after tasks with scheduled times. The scheduler also
+checks whether two incomplete tasks overlap, including tasks belonging to
+different pets, and reports those conflicts as warnings.
+
+For recurring tasks, the scheduler creates the next incomplete instance after
+completion. Daily tasks move forward one day, weekly tasks move forward seven
+days, and monthly tasks move forward thirty days. I treated completion status
+and scheduled time as the most important constraints because the owner first
+needs to know what still needs to be done and when it should happen. Duration
+and pet ownership are then used to identify practical conflicts in the plan.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+The conflict detector uses a simple pairwise comparison of scheduled tasks. It
+checks each task against the tasks that follow it and returns a readable
+warning when their time intervals overlap. This is easy to understand and
+handles both same-pet and cross-pet conflicts, but it is less efficient than a
+sweep-line or interval-tree algorithm for a very large number of tasks.
+
+The scheduler also reports the conflict instead of automatically moving,
+deleting, or rejecting either task. This means the owner still decides which
+care activity should change, so the program does not make an unsafe assumption
+about medication, feeding, or pet-care timing. The tradeoff is reasonable for
+this small household scheduling app because the number of tasks is expected to
+be small, and a clear warning is more useful than silently changing the owner's
+plan.
 
 ---
 
