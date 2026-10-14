@@ -87,14 +87,16 @@ Sample test output:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
+The scheduler combines filtering, sorting, conflict detection, and recurring
+task creation to build a practical household care schedule.
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
-| Recurring tasks | | e.g., daily vs. weekly |
+| Sorting behavior | `Scheduler.sort_tasks()` and `Scheduler.build_schedule()` | Sorts tasks by scheduled time. Tasks without a time appear after timed tasks. `build_schedule()` combines this with incomplete-task filtering. |
+| Filtering by completion status | `Scheduler.filter_tasks(owner, completion_status=...)` | Filters tasks to completed or incomplete tasks. The normal schedule includes only incomplete tasks. |
+| Filtering by pet | `Scheduler.filter_tasks(owner, pet_name=...)` | Returns tasks for a selected pet, using case-insensitive pet-name matching. Completion and pet filters can be combined. |
+| Conflict detection | `Scheduler.detect_conflicts()` | Checks incomplete tasks for overlapping time intervals, using each task's `time` and `duration_minutes`. Returns warning messages instead of crashing or automatically changing the schedule. |
+| Recurring tasks | `Scheduler.complete_task()` and `Scheduler._next_due_date()` | Completing a `daily`, `weekly`, or `monthly` task creates a new incomplete instance for the same pet. The next due date uses `timedelta(days=1)`, `timedelta(days=7)`, or `timedelta(days=30)`. |
 
 ## 📸 Demo Walkthrough
 
