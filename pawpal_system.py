@@ -101,6 +101,27 @@ class Scheduler:
                     matching_tasks.append(task)
         return matching_tasks
 
+    def detect_conflicts(self, owner: Owner) -> list[str]:
+        """Return warnings for incomplete tasks sharing the same scheduled time."""
+        tasks_by_time: dict[Time, list[tuple[str, Task]]] = {}
+        for pet in owner.pets:
+            for task in pet.tasks:
+                if not task.is_complete() and task.time is not None:
+                    tasks_by_time.setdefault(task.time, []).append((pet.name, task))
+
+        warnings: list[str] = []
+        for scheduled_time, pet_tasks in tasks_by_time.items():
+            if len(pet_tasks) < 2:
+                continue
+            task_details = "; ".join(
+                f"{pet_name}: {task.description}" for pet_name, task in pet_tasks
+            )
+            warnings.append(
+                f"Warning: {len(pet_tasks)} tasks are scheduled at "
+                f"{scheduled_time.strftime('%H:%M')} ({task_details})."
+            )
+        return warnings
+
     def build_schedule(self, owner: Owner) -> list[Task]:
         """Return incomplete tasks from all pets, ordered by scheduled time."""
         tasks = self.filter_tasks(owner, completion_status=False)

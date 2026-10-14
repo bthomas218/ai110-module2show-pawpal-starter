@@ -15,13 +15,21 @@ def main() -> None:
 
     # Add tasks out of chronological order to demonstrate sorting.
     mochi.add_task(Task("task-1", "Evening play", time(18, 0), "daily"))
-    luna.add_task(Task("task-2", "Breakfast", time(8, 30), "daily"))
+    luna.add_task(Task("task-2", "Breakfast", time(8, 0), "daily"))
     mochi.add_task(Task("task-3", "Morning walk", time(8, 0), "daily"))
 
     scheduler = Scheduler()
 
     print("Today's Schedule")
     print(scheduler.render_schedule(owner))
+
+    print("\nConflict Check")
+    conflict_warnings = scheduler.detect_conflicts(owner)
+    if conflict_warnings:
+        for warning in conflict_warnings:
+            print(warning)
+    else:
+        print("No scheduling conflicts detected.")
 
     print("\nMochi's Tasks (filtered by pet)")
     for task in scheduler.sort_tasks(scheduler.filter_tasks(owner, pet_name="Mochi")):

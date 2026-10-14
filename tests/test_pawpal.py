@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 from pawpal_system import Owner, Pet, Scheduler, Task
 
@@ -62,3 +62,21 @@ def test_completing_one_time_task_does_not_create_next_instance() -> None:
 
     assert Scheduler().complete_task(owner, "task-1") is True
     assert len(pet.tasks) == 1
+
+
+def test_detect_conflicts_returns_warning_for_tasks_at_same_time() -> None:
+    owner = Owner("owner-1", "Jordan", "jordan@example.com")
+    mochi = Pet("pet-1", "Mochi", "dog", 3)
+    luna = Pet("pet-2", "Luna", "cat", 5)
+    mochi.add_task(Task("task-1", "Morning walk", time(8, 0)))
+    luna.add_task(Task("task-2", "Breakfast", time(8, 0)))
+    owner.add_pet(mochi)
+    owner.add_pet(luna)
+
+    warnings = Scheduler().detect_conflicts(owner)
+
+    assert len(warnings) == 1
+    assert "Warning:" in warnings[0]
+    assert "08:00" in warnings[0]
+    assert "Mochi" in warnings[0]
+    assert "Luna" in warnings[0]
