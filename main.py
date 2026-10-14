@@ -27,7 +27,7 @@ def main() -> None:
     for task in scheduler.sort_tasks(scheduler.filter_tasks(owner, pet_name="Mochi")):
         print(f"{task.time.strftime('%H:%M')} - {task.description}")
 
-    mochi.tasks[0].mark_complete()
+    scheduler.complete_task(owner, "task-1")
     print("\nIncomplete Tasks (filtered by completion status)")
     incomplete_tasks = scheduler.filter_tasks(owner, completion_status=False)
     for task in scheduler.sort_tasks(incomplete_tasks):

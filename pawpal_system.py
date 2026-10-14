@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import time as Time
+from datetime import date, time as Time, timedelta
 
 
 OwnerId = str
@@ -20,6 +20,7 @@ class Task:
     time: Time | None = None
     frequency: str = "once"
     completion_status: bool = False
+    due_date: date | None = None
 
     def mark_complete(self) -> None:
         """Mark this task as completed."""
@@ -106,12 +107,51 @@ class Scheduler:
         return self.sort_tasks(tasks)
 
     def complete_task(self, owner: Owner, task_id: TaskId) -> bool:
-        """Complete a task found across the owner's pets. Return ``True`` when a matching task is found, otherwise ``False``."""
-        for task in owner.get_all_tasks():
-            if task.id == task_id:
+        """Complete a task and schedule its next recurring instance when needed."""
+        for pet in owner.pets:
+            for task in pet.tasks:
+                if task.id != task_id:
+                    continue
+
                 task.mark_complete()
+                if task.frequency.lower() in {"daily", "weekly", "monthly"}:
+                    next_task_id = self._next_task_id(owner, task.id)
+                    pet.add_task(
+                        Task(
+                            id=next_task_id,
+                            description=task.description,
+                            time=task.time,
+                            frequency=task.frequency,
+                            due_date=self._next_due_date(task),
+                        )
+                    )
                 return True
         return False
+
+    def _next_due_date(self, task: Task) -> date:
+        """Return the next due date for a recurring task.
+
+        Monthly recurrence uses a 30-day interval, as requested, rather than
+        requiring an additional calendar library for variable-length months.
+        """
+        recurrence_days = {
+            "daily": 1,
+            "weekly": 7,
+            "monthly": 30,
+        }
+        interval = recurrence_days[task.frequency.lower()]
+        current_due_date = task.due_date or date.today()
+        return current_due_date + timedelta(days=interval)
+
+    def _next_task_id(self, owner: Owner, completed_task_id: TaskId) -> TaskId:
+        """Generate a unique ID for the next recurring task instance."""
+        existing_ids = {task.id for task in owner.get_all_tasks()}
+        instance_number = 1
+        next_task_id = f"{completed_task_id}-next-{instance_number}"
+        while next_task_id in existing_ids:
+            instance_number += 1
+            next_task_id = f"{completed_task_id}-next-{instance_number}"
+        return next_task_id
 
     def render_schedule(self, owner: Owner) -> str:
         """Render the owner's incomplete tasks as a simple text schedule."""
