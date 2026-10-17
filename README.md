@@ -71,19 +71,37 @@ Schedule for Jordan
 
 ## 🧪 Testing PawPal+
 
+Run the full test suite with:
+
 ```bash
-# Run the full test suite:
-pytest
-
-# Run with coverage:
-pytest --cov
+uv run pytest
 ```
 
-Sample test output:
+The tests cover task completion, adding tasks to pets, chronological sorting,
+untimed and same-time tasks, incomplete-task filtering, daily/weekly/monthly
+recurrence, recurring-task ID collisions, unknown task IDs, conflict detection,
+empty schedules, and case-insensitive pet filtering.
+
+Successful test output:
 
 ```
-# Paste your pytest output here
+============================= test session starts ==============================
+platform linux -- Python 3.13.11, pytest-9.1.1, pluggy-1.6.1
+rootdir: /home/brady/workspace/github.com/bthomas218/ai110-module2show-pawpal-starter
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 17 items
+
+tests/test_pawpal.py .................                                   [100%]
+
+============================== 17 passed in 0.02s ==============================
 ```
+
+Confidence Level: ★★★★☆ (4/5)
+
+The full automated suite passes, covering the scheduler's core behaviors and
+important edge cases. This confidence level leaves room for broader UI and
+integration testing beyond the current unit-test coverage.
 
 ## 📐 Smarter Scheduling
 
